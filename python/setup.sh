@@ -1,3 +1,3 @@
 #!/bin/bash
-pip install cmake
-pip install dlib
+pip install cmake --user
+pip install dlib --user

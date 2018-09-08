@@ -6,9 +6,14 @@ import glob
 import numpy as np
 import os
 import sys
+from subprocess import call
+
 
 predictor_path = "../res/shape_predictor_68_face_landmarks.dat"
 faces_folder_path = "../res/faces"
+
+myList = []
+
 
 def distance(p1, p2):
     dif = p1 - p2
@@ -47,6 +52,12 @@ def calc_eyebrows(shape):
     print("Right eyebrow curve : {}x^2 + {}x + {}".format(r_curve[0], r_curve[1], r_curve[2]))
     print("Right eyebrow width : {}".format(r_width))
 
+    #Adding the calculations onto the string parameter for create_character.py
+    myList.extend([str(l_curve[0]), str(l_curve[1]), str(l_curve[2])])
+    myList.extend([str(l_width)])
+    myList.extend([str(r_curve[0]), str(r_curve[1]), str(r_curve[2])])
+    myList.extend([str(r_width)])
+
 def calc_eyes(shape):
     l_points = get_points_in_range(shape, 36, 41)
     r_points = get_points_in_range(shape, 42, 47)
@@ -61,10 +72,20 @@ def calc_eyes(shape):
     print("Right eye area : {}".format(r_area))
     print("Right eye width : {} with slope : {}".format(r_width, r_slope[0]))
 
+    #Adding the calculations onto the string parameter for create_character.py
+    myList.extend([str(l_area)])
+    myList.extend([str(l_width), str(l_slope[0])])
+    myList.extend([str(r_area)])
+    myList.extend([str(r_width), str(r_slope[0])])
+
+
 def calc_jaw(shape):
     jaw_points = get_points_in_range(shape, 0, 16)
     jaw_curve = curve(jaw_points, 2)
     print("Jaw curve : {}x^2 + {}x + {}".format(jaw_curve[0], jaw_curve[1], jaw_curve[2]))
+
+    myList.extend([str(jaw_curve[0]), str(jaw_curve[1]), str(jaw_curve[2])])
+
 
 def calc_nose(shape):
     nose_width = distance(shape.part(31), shape.part(35))
@@ -72,6 +93,10 @@ def calc_nose(shape):
     nose_area = area(get_points_in_range(shape, 31, 35))
     print("Nose width : {}".format(nose_width))
     print("Nose area : {}".format(nose_area))
+
+    myList.extend([str(nose_width)])
+    myList.extend([str(nose_area)])
+
 
 def calc_lips(shape):
     lips_width = distance(shape.part(48), shape.part(54))
@@ -83,6 +108,12 @@ def calc_lips(shape):
     print("Lips height : {}".format(lips_height))
     print("Lips area : {}".format(lips_area))
     print("Lips curve : {}x^2 + {}x + {}".format(lips_curve[0], lips_curve[1], lips_curve[2]))
+
+    myList.extend([str(lips_width)])
+    myList.extend([str(lips_height)])
+    myList.extend([str(lips_area)])
+    myList.extend([str(lips_curve[0]), str(lips_curve[1]), str(lips_curve[2])])
+
 
 def calculate_face_parts(shape):
     calc_eyebrows(shape)
@@ -113,6 +144,7 @@ def main():
             win.add_overlay(shape)
             calculate_face_parts(shape)
         win.add_overlay(dets)
+        call(["python", "create_character.py"] + myList)
         dlib.hit_enter_to_continue()
 
 if __name__ == "__main__":
