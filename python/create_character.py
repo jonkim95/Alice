@@ -10,7 +10,7 @@ from subprocess import call
 #
 
 predictor_path = "../res/shape_predictor_68_face_landmarks.dat"
-faces_folder_path = "../res/facial design parts"
+facial_design_folder_path = "../res/facial design parts"
 
 def parse_arguments(args):
 	left_eyebrow_curve = [float(args[0]), float(args[1]), float(args[2])]
